@@ -1,0 +1,6 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/fir.v" into library work
+INFO: [VRFC 10-311] analyzing module fir
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/bram11.v" into library work
+INFO: [VRFC 10-311] analyzing module bram11
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/fir_tb.v" into library work
+INFO: [VRFC 10-311] analyzing module fir_tb

@@ -1,0 +1,7 @@
+0.7
+2020.2
+Apr 18 2022
+15:53:03
+/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/bram11.v,1697537970,verilog,,/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/fir_tb.v,,bram11,,,,,,,,
+/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/fir.v,1697538650,verilog,,/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/bram11.v,,fir,,,,,,,,
+/home/ubuntu/Desktop/test/SOC_LAB3-main/SOC_LAB3-main/design/fir_tb.v,1697538427,verilog,,,,fir_tb,,,,,,,,

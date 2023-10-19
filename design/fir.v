@@ -51,7 +51,7 @@ module fir
 parameter ap_idle = 0;
 parameter ap_start = 1;
 parameter ap_done = 2;
-
+wire ctrl_tap_ready, ctrl_tap_valid, muxsel, ffen;
 reg [1:0] state;
 assign ap_state = state;
 wire stream_prepared;
@@ -236,7 +236,7 @@ assign ss_write_valid = ~ ss_read_valid;
 //AXI4_Stream read
 
 reg ctrl_tap_ready_r, tap_EN_sr_r, tap_EN_r_d;
-wire ctrl_tap_ready, ctrl_tap_valid, muxsel, ffen;
+
 
 
 reg [pADDR_WIDTH-1:0] tap_RA_lr_r, tap_RA_sr_r;

@@ -63,7 +63,7 @@ wire [(pDATA_WIDTH-1):0] data_Di;
 wire [(pADDR_WIDTH-1):0] data_A;
 wire [(pDATA_WIDTH-1):0] data_Do;
 
-wire [1:0] state;
+
 
 fir fir_DUT(
         .awready(awready),
@@ -102,8 +102,7 @@ fir fir_DUT(
         .data_Do(data_Do),
 
         .axis_clk(axis_clk),
-        .axis_rst_n(axis_rst_n),
-        .ap_state(state)
+        .axis_rst_n(axis_rst_n)
 
     );
 
@@ -179,7 +178,7 @@ initial begin
     ss(Din_list[(Data_Num-1)]);
     $display("------End the data input(AXI-Stream)------");
 end
-
+reg error_coef;
 integer k;
 reg error;
 reg status_error;
@@ -232,7 +231,7 @@ initial begin
     coef[10] =  32'd0;
 end
 
-reg error_coef;
+
 initial begin
     error_coef = 0;
     $display("----Start the coefficient input(AXI-lite)----");
