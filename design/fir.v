@@ -1,49 +1,44 @@
 `timescale 1ns/1ns
-
-    module fir
-    #(  parameter pADDR_WIDTH = 12,
-        parameter pDATA_WIDTH = 32,
-        parameter Tape_Num    = 11
-     )
-    (
-        output  wire                     awready,
-        output  wire                     wready,
-        input   wire                     awvalid,
-        input   wire [(pADDR_WIDTH-1):0] awaddr,
-        input   wire                     wvalid,
-        input   wire [(pDATA_WIDTH-1):0] wdata,
-        output  wire                     arready,
-        input   wire                     rready,
-        input   wire                     arvalid,
-        input   wire [(pADDR_WIDTH-1):0] araddr,
-        output  wire                     rvalid,
-        output  wire [(pDATA_WIDTH-1):0] rdata,
-        input   wire                     ss_tvalid,
-        input   wire [(pDATA_WIDTH-1):0] ss_tdata,
-        input   wire                     ss_tlast,
-        output  wire                     ss_tready,
-        input   wire                     sm_tready,
-        output  wire                     sm_tvalid,
-        output  wire [(pDATA_WIDTH-1):0] sm_tdata,
-        output  wire                     sm_tlast,
-
-        // bram for tap RAM
-        output  wire           [3:0]     tap_WE,
-        output  wire                     tap_EN,
-        output  wire [(pDATA_WIDTH-1):0] tap_Di,
-        output  wire [(pADDR_WIDTH-1):0] tap_A,
-        input   wire [(pDATA_WIDTH-1):0] tap_Do,
-
-        // bram for data RAM
-        output  wire            [3:0]    data_WE,
-        output  wire                     data_EN,
-        output  wire [(pDATA_WIDTH-1):0] data_Di,
-        output  wire [(pADDR_WIDTH-1):0] data_A,
-        input   wire [(pDATA_WIDTH-1):0] data_Do,
-
-        input   wire                     axis_clk,
-        input   wire                     axis_rst_n
-    );
+module fir
+#(  parameter pADDR_WIDTH = 12,
+    parameter pDATA_WIDTH = 32,
+    parameter Tape_Num    = 11
+ )
+(   output  wire                     awready,
+    output  wire                     wready,
+    input   wire                     awvalid,
+    input   wire [(pADDR_WIDTH-1):0] awaddr,
+    input   wire                     wvalid,
+    input   wire [(pDATA_WIDTH-1):0] wdata,
+    output  wire                     arready,
+    input   wire                     rready,
+    input   wire                     arvalid,
+    input   wire [(pADDR_WIDTH-1):0] araddr,
+    output  wire                     rvalid,
+    output  wire [(pDATA_WIDTH-1):0] rdata,
+    input   wire                     ss_tvalid,
+    input   wire [(pDATA_WIDTH-1):0] ss_tdata,
+    input   wire                     ss_tlast,
+    output  wire                     ss_tready,
+    input   wire                     sm_tready,
+    output  wire                     sm_tvalid,
+    output  wire [(pDATA_WIDTH-1):0] sm_tdata,
+    output  wire                     sm_tlast,
+    // bram for tap RAM
+    output  wire           [3:0]     tap_WE,
+    output  wire                     tap_EN,
+    output  wire [(pDATA_WIDTH-1):0] tap_Di,
+    output  wire [(pADDR_WIDTH-1):0] tap_A,
+    input   wire [(pDATA_WIDTH-1):0] tap_Do,
+    // bram for data RAM
+    output  wire            [3:0]    data_WE,
+    output  wire                     data_EN,
+    output  wire [(pDATA_WIDTH-1):0] data_Di,
+    output  wire [(pADDR_WIDTH-1):0] data_A,
+    input   wire [(pDATA_WIDTH-1):0] data_Do,
+    input   wire                     axis_clk,
+    input   wire                     axis_rst_n
+);
 // write your code here!
 
 //state
@@ -358,34 +353,7 @@ assign ctrl_tap_ready = ctrl_tap_ready_r;
 
 wire [3:0] ctrl_count;
 
-//caculate fir
-// ctrl#(
-//         .ADDR_W(pADDR_WIDTH)
-//     )ctrl_tap (
-//         .i_clk(axis_clk),
-//         .i_rst_n(ctrl_rst_n),
-//         .i_ready(ctrl_tap_ready),
-//         .o_valid(ctrl_tap_valid),
-//         .o_data_addr(ctrl_data_addr),
-//         .o_tap_addr(ctrl_tap_addr),
-//         .muxsel(muxsel),
-//         .ffen(ffen),
-//         .count(ctrl_count)
-//     );
-
-
-// module ctrl
-// (
-//         input                     i_clk,
-//         input                     i_rst_n,
-//         input                     i_ready,
-//         output                    o_valid,
-//         output      [11:0]  o_data_addr,
-//         output      [11:0]  o_tap_addr,
-//         output                    muxsel,
-//         output                    ffen,
-//         output      [3:0]         count
-//     );
+//control fir
 
 assign i_clk = axis_clk;
 assign i_rst_n = ctrl_rst_n;
@@ -441,10 +409,6 @@ always@(posedge i_clk) begin
         ffen_r <= 0;
     end
 end
-// endmodule
-
-
-
 
 
 //AXI4_Lite write
