@@ -153,8 +153,8 @@ reg [31:0]  data_length;
 integer Din, golden, input_data, golden_data, m;
 initial begin
     data_length = 0;
-    Din = $fopen("C:/Users/yushu/Downloads/Telegram Desktop/lab-fir_sim3times/lab-fir_sim3times/fir/samples_triangular_wave.dat","r");
-    golden = $fopen("C:/Users/yushu/Downloads/Telegram Desktop/lab-fir_sim3times/lab-fir_sim3times/fir/out_gold.dat","r");
+    Din = $fopen("C:/Users/yushuo/Desktop/SOC/lab-fir/fir/samples_triangular_wave.dat","r");
+    golden = $fopen("C:/Users/yushuo/Desktop/SOC/lab-fir/fir/out_gold.dat","r");
     for(m=0;m<Data_Num;m=m+1) begin
         input_data = $fscanf(Din,"%d", Din_list[m]);
         golden_data = $fscanf(golden,"%d", golden_list[m]);
@@ -165,7 +165,7 @@ end
 integer i;
 initial begin
 
-    $display("------------Start simulation 1-----------");
+    $display("------------Start simulation-----------");
     ss_tvalid = 0;
     $display("----Start the data input(AXI-Stream)----");
     for(i=0;i<(data_length-1);i=i+1) begin
@@ -176,86 +176,24 @@ initial begin
     arvalid <= 0;
     ss_tlast = 1;
     ss(Din_list[(Data_Num-1)]);
-
-
-    $display("------End the data input 1(AXI-Stream)------");
-
-    while (!sm_tlast)
-        @(posedge axis_clk);
-
-    ss_tlast = 0;
-    awvalid <= 0;
-    wvalid <= 0;
-
-    $display("------------Start simulation 2-----------");
-    ss_tvalid = 0;
-    $display("----Start the data input(AXI-Stream)----");
-    for(i=0;i<(data_length-1);i=i+1) begin
-        ss_tlast = 0;
-        ss(Din_list[i]);
-    end
-    config_read_check(12'h00, 32'h00, 32'h0000_000f); // check idle = 0
-    arvalid <= 0;
-    ss_tlast = 1;
-    ss(Din_list[(Data_Num-1)]);
-    $display("------End the data input 2(AXI-Stream)------");
-
-
-    while (!sm_tlast)
-        @(posedge axis_clk);
-
-    ss_tlast = 0;
-    awvalid <= 0;
-    wvalid <= 0;
-
-    $display("------------Start simulation 3-----------");
-    ss_tvalid = 0;
-    $display("----Start the data input(AXI-Stream)----");
-    for(i=0;i<(data_length-1);i=i+1) begin
-        ss_tlast = 0;
-        ss(Din_list[i]);
-    end
-    config_read_check(12'h00, 32'h00, 32'h0000_000f); // check idle = 0
-    arvalid <= 0;
-    ss_tlast = 1;
-    ss(Din_list[(Data_Num-1)]);
-
-    $display("------End the data input 3(AXI-Stream)------"); 
+    $display("------End the data input(AXI-Stream)------");
 end
 
 integer k;
-reg error_coef;
 reg error;
 reg status_error;
 initial begin
     error = 0;
     status_error = 0;
-
-    $display("------------Start check 1-----------");
     sm_tready = 1;
     wait (sm_tvalid);
     for(k=0;k < data_length;k=k+1) begin
         sm(golden_list[k],k);
     end
-    //config_read_check(12'h00, 32'h02, 32'h0000_0002); // check ap_done = 1 (0x00 [bit 1])
-    //arvalid <= 0;
-    //config_read_check(12'h00, 32'h04, 32'h0000_0004); // check ap_idle = 1 (0x00 [bit 2])
-    //arvalid <= 0;
-
-    $display("------------Start check 2-----------");
-    sm_tready = 1;
-    wait (sm_tvalid);
-    for(k=0;k < data_length;k=k+1) begin
-        sm(golden_list[k],k);
-    end 
-
-    $display("------------Start check 3-----------");
-    sm_tready = 1;
-    wait (sm_tvalid);
-    for(k=0;k < data_length;k=k+1) begin
-        sm(golden_list[k],k);
-    end 
-
+    config_read_check(12'h00, 32'h02, 32'h0000_0002); // check ap_done = 1 (0x00 [bit 1])
+    arvalid <= 0;
+    config_read_check(12'h00, 32'h04, 32'h0000_0004); // check ap_idle = 1 (0x00 [bit 2])
+    arvalid <= 0;
     if (error == 0 & error_coef == 0) begin
         $display("---------------------------------------------");
         $display("-----------Congratulations! Pass-------------");
@@ -293,7 +231,7 @@ initial begin
     coef[10] =  32'd0;
 end
 
-
+reg error_coef;
 initial begin
     error_coef = 0;
     $display("----Start the coefficient input(AXI-lite)----");
@@ -315,15 +253,6 @@ initial begin
     awvalid <= 0;
     wvalid <= 0;
     $display("----End the coefficient input(AXI-lite)----");
-
-
-     while (!sm_tlast)
-        @(posedge axis_clk);
-    config_write(12'h00, 32'h0000_0001);    // ap_start = 1
-
-    while (!sm_tlast)
-        @(posedge axis_clk);
-    config_write(12'h00, 32'h0000_0001);    // ap_start = 1 
 end
 
 task config_write;

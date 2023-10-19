@@ -1,49 +1,53 @@
 `timescale 1ns/1ns
+
 module fir
-#(  parameter pADDR_WIDTH = 12,
-    parameter pDATA_WIDTH = 32,
-    parameter Tape_Num    = 11
- )
-(   output  wire                     awready,
-    output  wire                     wready,
-    input   wire                     awvalid,
-    input   wire [(pADDR_WIDTH-1):0] awaddr,
-    input   wire                     wvalid,
-    input   wire [(pDATA_WIDTH-1):0] wdata,
-    output  wire                     arready,
-    input   wire                     rready,
-    input   wire                     arvalid,
-    input   wire [(pADDR_WIDTH-1):0] araddr,
-    output  wire                     rvalid,
-    output  wire [(pDATA_WIDTH-1):0] rdata,
-    input   wire                     ss_tvalid,
-    input   wire [(pDATA_WIDTH-1):0] ss_tdata,
-    input   wire                     ss_tlast,
-    output  wire                     ss_tready,
-    input   wire                     sm_tready,
-    output  wire                     sm_tvalid,
-    output  wire [(pDATA_WIDTH-1):0] sm_tdata,
-    output  wire                     sm_tlast,
-    // bram for tap RAM
-    output  wire           [3:0]     tap_WE,
-    output  wire                     tap_EN,
-    output  wire [(pDATA_WIDTH-1):0] tap_Di,
-    output  wire [(pADDR_WIDTH-1):0] tap_A,
-    input   wire [(pDATA_WIDTH-1):0] tap_Do,
-    // bram for data RAM
-    output  wire            [3:0]    data_WE,
-    output  wire                     data_EN,
-    output  wire [(pDATA_WIDTH-1):0] data_Di,
-    output  wire [(pADDR_WIDTH-1):0] data_A,
-    input   wire [(pDATA_WIDTH-1):0] data_Do,
-    input   wire                     axis_clk,
-    input   wire                     axis_rst_n
-);
+       #(  parameter pADDR_WIDTH = 12,
+           parameter pDATA_WIDTH = 32,
+           parameter Tape_Num    = 11
+        )
+       (
+           output  wire                     awready,
+           output  wire                     wready,
+           input   wire                     awvalid,
+           input   wire [(pADDR_WIDTH-1):0] awaddr,
+           input   wire                     wvalid,
+           input   wire [(pDATA_WIDTH-1):0] wdata,
+           output  wire                     arready,
+           input   wire                     rready,
+           input   wire                     arvalid,
+           input   wire [(pADDR_WIDTH-1):0] araddr,
+           output  wire                     rvalid,
+           output  wire [(pDATA_WIDTH-1):0] rdata,
+           input   wire                     ss_tvalid,
+           input   wire [(pDATA_WIDTH-1):0] ss_tdata,
+           input   wire                     ss_tlast,
+           output  wire                     ss_tready,
+           input   wire                     sm_tready,
+           output  wire                     sm_tvalid,
+           output  wire [(pDATA_WIDTH-1):0] sm_tdata,
+           output  wire                     sm_tlast,
+
+           // bram for tap RAM
+           output  wire           [3:0]     tap_WE,
+           output  wire                     tap_EN,
+           output  wire [(pDATA_WIDTH-1):0] tap_Di,
+           output  wire [(pADDR_WIDTH-1):0] tap_A,
+           input   wire [(pDATA_WIDTH-1):0] tap_Do,
+
+           // bram for data RAM
+           output  wire            [3:0]    data_WE,
+           output  wire                     data_EN,
+           output  wire [(pDATA_WIDTH-1):0] data_Di,
+           output  wire [(pADDR_WIDTH-1):0] data_A,
+           input   wire [(pDATA_WIDTH-1):0] data_Do,
+
+           input   wire                     axis_clk,
+           input   wire                     axis_rst_n
+       );
 // write your code here!
 
 //state
 parameter ap_idle = 0;
-//parameter ap_idle = 1;
 parameter ap_start = 1;
 parameter ap_done = 2;
 
@@ -53,25 +57,17 @@ reg ap_start_sig;
 reg     sm_tlast_r;
 reg     ss_finish_r;
 wire    ss_finish;
-
-reg ctrl_rst_n;
-
-reg ctrl_tap_ready_r, tap_EN_sr_r, tap_EN_r_d;
-wire ctrl_tap_ready, ctrl_tap_valid, muxsel, ffen;
-
 //state
 always @( posedge axis_clk ) begin
     if ( !axis_rst_n ) begin
         state <= ap_idle;
-        ctrl_rst_n <= 0;
     end
     else begin
         case(state)
             ap_idle: begin
-                if(stream_prepared && ap_start_sig) begin
+                if(stream_prepared  && ap_start_sig)
                     state <= ap_start;
-                    ctrl_rst_n <= 1;
-                end
+
                 sm_tlast_r <= 0;
             end
 
@@ -88,9 +84,6 @@ always @( posedge axis_clk ) begin
 
             ap_done: begin
                 sm_tlast_r <= 0;
-                state <= ap_idle;
-                ctrl_rst_n <= 0;
-
             end
             default:
                 state <= ap_idle;
@@ -168,7 +161,6 @@ always @( posedge axis_clk ) begin
                 end
 
                 ap_start: begin
-
                     if(ss_write_valid) begin
                         ss_tready_r <= 1;
                         data_WE_r <= 4'b1111;
@@ -188,9 +180,7 @@ always @( posedge axis_clk ) begin
                         ss_tready_r <= 0;
 
                     end
-                end
 
-                ap_done: begin
 
 
                 end
@@ -202,17 +192,6 @@ always @( posedge axis_clk ) begin
             ss_tready_r <= 0;
             if(ss_tlast)
                 ss_finish_r <= 1;
-            else if (ss_write_valid)
-                ss_finish_r <= 0;
-
-            case(state)
-
-                ap_done: begin
-                    stream_prepared_r <= 0;
-                    ss_count_r <= 0;
-
-                end
-            endcase
 
 
         end
@@ -254,7 +233,8 @@ assign ss_write_valid = ~ ss_read_valid;
 
 //AXI4_Stream read
 
-
+reg ctrl_tap_ready_r, tap_EN_sr_r, tap_EN_r_d;
+wire ctrl_tap_ready, ctrl_tap_valid, muxsel, ffen;
 
 
 reg [pADDR_WIDTH-1:0] tap_RA_lr_r, tap_RA_sr_r;
@@ -273,7 +253,6 @@ always @( posedge axis_clk ) begin
         if (sm_tready && !sm_tvalid) begin
             case(state)
                 ap_idle: begin
-                    sm_tvalid_r <= 0;
                 end
 
                 ap_start: begin
@@ -354,35 +333,24 @@ assign ctrl_tap_ready = ctrl_tap_ready_r;
 wire [3:0] ctrl_count;
 
 //control fir
-
-assign i_clk = axis_clk;
-assign i_rst_n = ctrl_rst_n;
-assign i_ready = ctrl_tap_ready;
-assign o_valid = ctrl_tap_valid;
-assign o_data_addr = ctrl_data_addr;
-assign o_tap_addr = ctrl_tap_addr;
-assign count = ctrl_count;
-
 wire en;
 reg o_valid_r, ffen_r;
 reg [11:0]o_data_addr_r, o_tap_addr_r;
 
 
-assign o_valid = o_valid_r;
-assign o_data_addr = o_data_addr_r;
-assign o_tap_addr = o_tap_addr_r;
+assign ctrl_tap_valid = o_valid_r;
+assign ctrl_data_addr = o_data_addr_r;
+assign ctrl_tap_addr = o_tap_addr_r;
 assign ffen = ffen_r;
 assign muxsel = ~ffen ;
-assign en = i_ready & o_valid;
-
-//wire[3:0] count;
+assign en = ctrl_tap_ready & ctrl_tap_valid;
 reg[3:0] count_r;
-assign count = count_r;
+assign ctrl_count = count_r;
 
 reg [11:0]tap_last_addr_r;
 
-always@(posedge i_clk) begin
-    if (!i_rst_n) begin
+always@(posedge axis_clk) begin
+    if (!axis_rst_n) begin
         o_data_addr_r <= 0;
         o_tap_addr_r <= 12'd40;
         ffen_r <= 0;
@@ -390,17 +358,17 @@ always@(posedge i_clk) begin
         count_r <= 0;
     end
     else if(en) begin
-        o_valid_r <= (count == 4'd11) ? 0 : 1;
+        o_valid_r <= (ctrl_count == 4'd11) ? 0 : 1;
 
-        o_data_addr_r <= (count == 4'd11)? 0:o_data_addr_r + 4;
+        o_data_addr_r <= (ctrl_count == 4'd11)? 0:o_data_addr_r + 4;
 
-        o_tap_addr_r <= (count == 4'd11) ? tap_last_addr_r :
-                     (o_tap_addr == 12'd40) ? 0 : o_tap_addr + 4;
+        o_tap_addr_r <= (ctrl_count == 4'd11) ? tap_last_addr_r :
+                     (ctrl_tap_addr == 12'd40) ? 0 : ctrl_tap_addr + 4;
 
-        tap_last_addr_r <= (count == 0 && o_tap_addr == 0) ? 12'd40 :
-                        (count == 0) ? o_tap_addr - 4 : tap_last_addr_r;
+        tap_last_addr_r <= (ctrl_count == 0 && ctrl_tap_addr == 0) ? 12'd40 :
+                        (ctrl_count == 0) ? ctrl_tap_addr - 4 : tap_last_addr_r;
 
-        count_r <= (count == 4'd11) ? 0 :count + 1;
+        count_r <= (ctrl_count == 4'd11) ? 0 :ctrl_count + 1;
 
         ffen_r <= 1;
     end
@@ -409,6 +377,7 @@ always@(posedge i_clk) begin
         ffen_r <= 0;
     end
 end
+
 
 
 //AXI4_Lite write
@@ -461,8 +430,7 @@ always @( posedge axis_clk ) begin
         end
         else begin
             wready_r <= 0;
-            if(stream_prepared)
-                ap_start_sig <= 0;
+            ap_start_sig <= 0;
         end
 
     end
