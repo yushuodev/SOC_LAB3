@@ -63,7 +63,7 @@ wire [(pDATA_WIDTH-1):0] data_Di;
 wire [(pADDR_WIDTH-1):0] data_A;
 wire [(pDATA_WIDTH-1):0] data_Do;
 
-
+wire [1:0] state;
 
 fir fir_DUT(
         .awready(awready),
@@ -102,7 +102,8 @@ fir fir_DUT(
         .data_Do(data_Do),
 
         .axis_clk(axis_clk),
-        .axis_rst_n(axis_rst_n)
+        .axis_rst_n(axis_rst_n),
+        .ap_state(state)
 
     );
 

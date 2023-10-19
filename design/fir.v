@@ -42,7 +42,8 @@ module fir
            input   wire [(pDATA_WIDTH-1):0] data_Do,
 
            input   wire                     axis_clk,
-           input   wire                     axis_rst_n
+           input   wire                     axis_rst_n,
+           output  wire [1:0]               ap_state 
        );
 // write your code here!
 
@@ -52,6 +53,7 @@ parameter ap_start = 1;
 parameter ap_done = 2;
 
 reg [1:0] state;
+assign ap_state = state;
 wire stream_prepared;
 reg ap_start_sig;
 reg     sm_tlast_r;
